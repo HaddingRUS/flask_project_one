@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 import config as config
-from data import tours, departures
+from data import tours, departures, title
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -8,7 +8,7 @@ app.config.from_object(config)
 
 @app.route('/')
 def index():
-    return render_template('index.html', tours=tours, departures=departures)
+    return render_template('index.html', tours=tours, departures=departures, title=title)
 
 
 @app.route('/departures/<departure>')
@@ -22,19 +22,22 @@ def departures_html(departure):
             length += 1
             list_price.append(values['price'])
             list_nights.append(values['nights'])
-    max_price = max(list_price)
-    min_price = min(list_price)
-    max_night = max(list_nights)
-    min_night = min(list_nights)
+    try:
+        max_price = max(list_price)
+        min_price = min(list_price)
+        max_night = max(list_nights)
+        min_night = min(list_nights)
+    except ValueError:
+        return 'Введены неправильные данные'
     list_data.extend([length, max_price, min_price, max_night, min_night])
     return render_template('departure.html',
                            departure=departure, departures=departures,
-                           tours=tours, list_data=list_data)
+                           tours=tours, list_data=list_data, title=title)
 
 
 @app.route('/tours/<int:ids>')
 def tours_web(ids):
-    return render_template('tour.html', ids=ids, tours=tours, departures=departures)
+    return render_template('tour.html', ids=ids, tours=tours, departures=departures, title=title)
 
 
 @app.errorhandler(404)
